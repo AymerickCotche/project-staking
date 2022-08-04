@@ -48,7 +48,9 @@ const Header = () => {
   return (
     <div className={styles.header__container}>
       <header className={styles.header}>
-        <h1 className={styles.header__title}>Staking</h1>
+        <Link href="/">
+          <h1 className={styles.header__title}>Staking</h1>
+        </Link>
         <Link href="/mint">
           <a>Mint Alyra Token</a>
         </Link>

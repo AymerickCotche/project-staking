@@ -47,6 +47,9 @@
         cursor: pointer;
       }
     }
+    &__btn:hover {
+      color: blue;
+    }
     &__btn {
       color: #EEE;
       background-color: vars.$color3;
@@ -73,6 +76,9 @@
   &__actions {
     display: flex;
     flex-direction: column;
+    &__unstake:hover {
+      color: blue;
+    }
     &__unstake {
       color: #EEE;
       background-color: vars.$color3;
@@ -82,6 +88,9 @@
       -webkit-box-shadow: inset 1px 1px 5px #fff;
       box-shadow: inset 1px 1px 5px #fff;
       margin-bottom: 0.8em;
+    }
+    &__collect:hover {
+      color: blue;
     }
     &__collect {
       color: #EEE;

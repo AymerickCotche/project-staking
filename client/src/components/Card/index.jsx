@@ -46,14 +46,14 @@ const Card = () => {
   }
 
   const preventMinus = (e) => {
-    console.log(e.target.value);
     if (e.code === 'NumpadSubtract') {
         e.preventDefault();
     }
 };
 
   const handleClickUseMax = () => {
-    dispatch(setInputQuantity(ayaBalance));
+    if (ayaBalance > 0) dispatch(setInputQuantity(ayaBalance));
+    
   }
   return(
     <div className={styles.card}>
@@ -70,7 +70,6 @@ const Card = () => {
       
         <div className={styles.card__form__stake}>
           <input
-            type="number"
             min="0"
             onKeyDown={preventMinus}
             className={styles.card__form__stake__input}

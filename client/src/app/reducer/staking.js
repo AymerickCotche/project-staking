@@ -4,7 +4,7 @@ import { setAyaBalance, getAyaInstance, setInputQuantity } from '../actions/stak
 
 const initialState = {
   ayaInstance: null,
-  ayaBalance: null,
+  ayaBalance: 0,
   ayaStacked: null,
   ayaRewards: null,
   ayaUnlockIn: null,
