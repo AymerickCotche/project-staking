@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import styles from './Card.module.scss';
 import ayalogo from '../../../public/ayalogo.png';
-import { getAyaInstance, setAyaBalance } from '../../app/actions/staking';
+import { getAyaInstance, setAyaBalance, setInputQuantity } from '../../app/actions/staking';
 
 
 
@@ -17,6 +17,8 @@ const Card = () => {
   const mmConnected = useSelector((state) => state.web3.metamask.isConnected);
   const ayaInstance = useSelector((state) => state.staking.ayaInstance);
   const ayaBalance = useSelector((state) => state.staking.ayaBalance);
+  const inputQuantity = useSelector((state) => state.staking.inputQuantity);
+
 
   useEffect(() => {
 
@@ -38,6 +40,21 @@ const Card = () => {
 
   }, [ayaInstance, address])
 
+  const handleChangeInputQuantity = (e) => {
+    const re = /^[0-9\b]+$/;
+    if(e.target.value === '' || re.test(e.target.value)) dispatch(setInputQuantity(e.target.value));
+  }
+
+  const preventMinus = (e) => {
+    console.log(e.target.value);
+    if (e.code === 'NumpadSubtract') {
+        e.preventDefault();
+    }
+};
+
+  const handleClickUseMax = () => {
+    dispatch(setInputQuantity(ayaBalance));
+  }
   return(
     <div className={styles.card}>
       <div className={styles.card__img}>
@@ -52,8 +69,16 @@ const Card = () => {
       <form className={styles.card__form}>
       
         <div className={styles.card__form__stake}>
-          <input type="text" className={styles.card__form__stake__input} placeholder='Quantity'/>
-          <p className={styles.card__form__stake__usemax}>use max</p>
+          <input
+            type="number"
+            min="0"
+            onKeyDown={preventMinus}
+            className={styles.card__form__stake__input}
+            placeholder='Quantity'
+            value={inputQuantity}
+            onChange={handleChangeInputQuantity}
+          />
+          <p className={styles.card__form__stake__usemax} onClick={handleClickUseMax}>use max</p>
         </div>
         
         <button className={styles.card__form__btn}>STAKE NOW</button>

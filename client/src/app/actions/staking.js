@@ -12,3 +12,5 @@ export const getAyaInstance = createAsyncThunk('staking/getAyaInstance', async (
 });
 
 export const setAyaBalance = createAction('staking/setAyaBalance');
+
+export const setInputQuantity = createAction('staking/setInputQuantity');
