@@ -5,7 +5,7 @@ import { connectMetamask, checkMetamaskInstall, checkMetamaskInit, saveChainId, 
 import Link from 'next/link';
 import Web3 from 'web3';
 
-import SimpleStorage from '../../contracts/SimpleStorage.json';
+import Staking from '../../contracts/Staking.json';
 import styles from './Header.module.scss';
 
 
@@ -40,7 +40,7 @@ const Header = () => {
     dispatch(connectMetamask());
     dispatch(saveChainId(window.ethereum.chainId));
     const web3 = new Web3(window.ethereum);
-    const instance = new web3.eth.Contract(SimpleStorage.abi, SimpleStorage.networks[1659268927400].address);
+    const instance = new web3.eth.Contract(Staking.abi, Staking.networks[42].address);
     dispatch(saveWeb3(web3));
     dispatch(saveInstance(instance));
 };
@@ -49,6 +49,9 @@ const Header = () => {
     <div className={styles.header__container}>
       <header className={styles.header}>
         <h1 className={styles.header__title}>Staking</h1>
+        <Link href="/mint">
+          <a>Mint Alyra Token</a>
+        </Link>
         <div>
         {mmInstalled && !mmConnected &&
           <button

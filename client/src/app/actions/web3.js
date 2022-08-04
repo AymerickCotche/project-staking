@@ -17,13 +17,13 @@ export const connectMetamask = createAsyncThunk('web3/connectMetamask', async ()
   const provider = window.ethereum;
   const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
     const chainId = await provider.request({ method: 'eth_chainId' });
-    if(chainId === '0x539'){
+    if(chainId === '0x2A'){
       return accounts[0];
     } else {
       try {
         await provider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x539'}],
+          params: [{ chainId: '0x2A'}],
         });
         return accounts[0];
       } catch (switchError) {
@@ -40,13 +40,13 @@ export const checkChainId = createAsyncThunk('web3/checkChainId', async () => {
   const provider = window.ethereum;
   const accounts = await window.ethereum.request({method: 'eth_requestAccounts'});
     const chainId = await provider.request({ method: 'eth_chainId' });
-    if(chainId === '0x539'){
+    if(chainId === '0x2A'){
       return accounts[0];
     } else {
       try {
         await provider.request({
           method: 'wallet_switchEthereumChain',
-          params: [{ chainId: '0x539'}],
+          params: [{ chainId: '0x2A'}],
         });
         
       } catch (switchError) {
