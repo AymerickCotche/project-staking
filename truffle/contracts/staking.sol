@@ -46,9 +46,7 @@ contract Staking is Ownable  {
          percentage2 = _percentage;      
     }
 
-    function ApproveToken(address tokenAddress, uint256 amount) public {
-        ERC20(tokenAddress).approve((msg.sender), amount);
-    }
+
 
    function stake(uint256 _amountToken,address token,uint256 _option ) 
     external  {
