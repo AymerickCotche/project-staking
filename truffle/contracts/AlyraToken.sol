@@ -19,7 +19,6 @@ contract Staking is Ownable  {
     
      struct Stake {
         uint256 amount;
-        
         uint256 option; // 1 ou 0 si 0 l,argent est bloker pour une journneé si 1 pour 3 mois  
         uint256 time; 
         uint exist;   
@@ -52,7 +51,7 @@ contract Staking is Ownable  {
     }
 
    function stake(uint256 _amountToken,address token,uint256 _option ) 
-    external payable  {
+    external  {
         //Transfer amount to smartcontract
        Token = ERC20(token); 
        Token.transferFrom(msg.sender, address(this), _amountToken);
@@ -91,9 +90,9 @@ contract Staking is Ownable  {
         if(_option==0){ //reward is 10% of stacked amount if 1 DAY
       
       
-            rateStaked=_time-userStake[user][token].time*percentage1*1e18/360/24/60/60; // 1e8 parce que c un entier ;  
+            rateStaked =_time-userStake[user][token].time*percentage1*1e18/360/24/60/60; // 1e8 parce que c un entier ;  
 
-            _reward=userStake[user][token].amount*rateStaked/1e18;
+            _reward = userStake[user][token].amount*rateStaked/1e18;
 
         }
 
@@ -131,13 +130,17 @@ contract Staking is Ownable  {
     }
 
     function ClaimRewards() public {
-        address user=msg.sender;
-       require(nbTokenUser[user]>0 ,"No Reward to claim !");
+        
+       require(nbTokenUser[msg.sender]>0 ,"No Reward to claim !");
         uint256 amountClaimed=0;//compute if rewrds available now
-        for (uint256 j = 0; j <nbTokenUser[user] ; j++){
-        address _token=TokenUser[user][j];
-        amountClaimed+=usersReward[user][_token];
-        usersReward[user][_token]=0;
+        
+        address _token;
+        uint256 _reward;
+        for (uint256 j = 0; j <nbTokenUser[msg.sender] ; j++){
+            _token=TokenUser[msg.sender][j];
+            _reward=reward(msg.sender,_token);
+            amountClaimed+=usersReward[msg.sender][_token];
+            usersReward[msg.sender][_token]=0;
 
         }
         
