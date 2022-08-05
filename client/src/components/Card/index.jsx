@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import styles from './Card.module.scss';
 import ayalogo from '../../../public/ayalogo.png';
-import { getAyaInstance, setAyaBalance, setInputQuantity } from '../../app/actions/staking';
+import { getAyaInstance, getStakingInstance, setAyaBalance, setInputQuantity } from '../../app/actions/staking';
 
 
 
@@ -17,6 +17,8 @@ const Card = () => {
   const mmConnected = useSelector((state) => state.web3.metamask.isConnected);
   const ayaInstance = useSelector((state) => state.staking.ayaInstance);
   const ayaBalance = useSelector((state) => state.staking.ayaBalance);
+  const stakingInstance = useSelector((state) => state.staking.stakingInstance);
+
   const inputQuantity = useSelector((state) => state.staking.inputQuantity);
 
 
@@ -24,6 +26,7 @@ const Card = () => {
 
     if (mmConnected) {
       dispatch(getAyaInstance());
+      dispatch(getStakingInstance());
     }
 
   }, [mmConnected]);
@@ -55,6 +58,10 @@ const Card = () => {
     if (ayaBalance > 0) dispatch(setInputQuantity(ayaBalance));
     
   }
+  const handleClickStakeNow = async (e) => {
+    e.preventDefault();
+    await stakingInstance.methods.stake(inputQuantity, ayaInstance.options.address, 0).send({from: address});
+  }
   return(
     <div className={styles.card}>
       <div className={styles.card__img}>
@@ -80,7 +87,12 @@ const Card = () => {
           <p className={styles.card__form__stake__usemax} onClick={handleClickUseMax}>use max</p>
         </div>
         
-        <button className={styles.card__form__btn}>STAKE NOW</button>
+        <button
+          className={styles.card__form__btn}
+          onClick={handleClickStakeNow}
+        >
+          STAKE NOW
+        </button>
       </form>
       <div className={styles.card__infos}>
         <p className={styles.card__infos__stacked}>Staked : xx</p>

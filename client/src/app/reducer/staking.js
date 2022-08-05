@@ -1,5 +1,5 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { setAyaBalance, getAyaInstance, setInputQuantity } from '../actions/staking';
+import { setAyaBalance, getAyaInstance, setInputQuantity, getStakingInstance } from '../actions/staking';
 
 
 const initialState = {
@@ -9,6 +9,7 @@ const initialState = {
   ayaRewards: null,
   ayaUnlockIn: null,
   inputQuantity: '',
+  stakingInstance: null,
 };
 
 export const stakingReducer = createReducer(initialState, (builder) => {
@@ -21,6 +22,9 @@ export const stakingReducer = createReducer(initialState, (builder) => {
   })
   .addCase(setInputQuantity, (state, action) => {
     state.inputQuantity = action.payload;
+  })
+  .addCase(getStakingInstance.fulfilled, (state, action) => {
+    state.stakingInstance = action.payload;
   })
 });
 
