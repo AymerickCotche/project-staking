@@ -33,9 +33,10 @@ contract Staking is Ownable  {
   uint256 percentage2=50;
   uint256 percentage3=3110400000;
 
-
-
   event tokenStaked(address userAddress, uint256 amount, uint256 option, uint256 time);
+  event rewardClaimed(address userAddress, uint256 amount, uint256 option);
+  event tokenWithdraw(address userAddress, uint256 amount, uint256 option);
+
 
   constructor(AlyraToken _aya){
     AYA = _aya ;
@@ -100,6 +101,8 @@ contract Staking is Ownable  {
 
     IERC20(_token).transfer(msg.sender, amountToWithdraw);
 
+    event tokenWithdraw(user, amountToWithdraw, _option);
+
   }
 
   function claimRewards(uint _option, address _token) public {
@@ -135,6 +138,8 @@ contract Staking is Ownable  {
     userStake[_user][_option][_token].toClaim = false;
           
     AYA.mint(_user, _reward);
+
+    event rewardClaimed(_user, _reward, _option);
 
   }
 
