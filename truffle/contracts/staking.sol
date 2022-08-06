@@ -58,7 +58,7 @@ contract Staking is Ownable  {
 
     require(userStake[user][_option][_token].exist == false, "You have already stake and lock this token");
     require (_amountToken > 0, "Amount has to be > to 0");
-    require (_option <= 3, "should be 0 or 1");
+    require (_option <= 3, "should be 0, 1 or 2");
 
 
     userStake[user][_option][_token]=Stake(_amountToken, block.timestamp, true, true);
@@ -67,7 +67,13 @@ contract Staking is Ownable  {
 
   }
 
+  function getCurrentStake(address _address, address _token, uint _option) external view returns (Stake memory) {
+    return userStake[_address][_option][_token];
+  }
+
   function withdrawTokens(address _token, uint _option) public {
+    
+    require(userStake[user][_option][_token].toClaim == false);
     
     uint256 _time = block.timestamp;
     address user = msg.sender;
@@ -94,7 +100,7 @@ contract Staking is Ownable  {
     }
 
     amountToWithdraw = userStake[user][_option][_token].amount;
-
+    
     delete userStake[user][_option][_token].amount;
     delete userStake[user][_option][_token].exist;
     delete userStake[user][_option][_token].time;
