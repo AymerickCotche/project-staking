@@ -101,7 +101,7 @@ contract Staking is Ownable  {
 
     IERC20(_token).transfer(msg.sender, amountToWithdraw);
 
-    event tokenWithdraw(user, amountToWithdraw, _option);
+    emit tokenWithdraw(user, amountToWithdraw, _option);
 
   }
 
@@ -139,7 +139,7 @@ contract Staking is Ownable  {
           
     AYA.mint(_user, _reward);
 
-    event rewardClaimed(_user, _reward, _option);
+    emit rewardClaimed(_user, _reward, _option);
 
   }
 
