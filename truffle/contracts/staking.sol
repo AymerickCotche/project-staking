@@ -11,152 +11,142 @@ import "./PriceConsumer.sol";
 
 contract Staking is Ownable  {       
     
-     struct Stake {
-        uint256 amount;
-        uint256 option; // 1 ou 0 si 0 l,argent est bloker pour une journneé si 1 pour 3 mois  
-        uint256 time; 
-        uint exist;   
-    }
+  struct Stake {
+      uint256 amount;
+      uint256 time; 
+      bool exist;
+      bool toClaim;
+  }
     
-    uint256 constant FACTOR = 1e6;
-    uint256 constant DAY = 86400;
-    uint256 constant MOUNTH = 2592000;
+  uint256 constant FACTOR = 1e6;
+  uint256 constant DAY = 86400;
+  uint256 constant MOUNTH = 2592000;
 
-    mapping(address => mapping(address=>uint)) usersReward;
-    mapping(address => mapping(address=>Stake)) userStake;
-    mapping(address=>uint256)nbTokenUser;
-    mapping(address=>address[])TokenUser;
+  mapping(address => mapping(uint => mapping(address => Stake))) userStake;
+  mapping(address => mapping(address=>uint)) usersReward;
 
-    ERC20 public Token;
-    AlyraToken AYA;
-    PriceConsumer private priceConsumer = new PriceConsumer();
+  ERC20 public Token;
+  AlyraToken AYA;
+  PriceConsumer private priceConsumer = new PriceConsumer();
 
-    uint256 percentage1=10;
-    uint256 percentage2=30;
+  uint256 percentage1=22;
+  uint256 percentage2=50;
+  uint256 percentage3=3110400000;
 
-    constructor(AlyraToken _aya){
-      AYA = _aya ;
+
+
+  event tokenStaked(address userAddress, uint256 amount, uint256 option, uint256 time);
+
+  constructor(AlyraToken _aya){
+    AYA = _aya ;
+  }
+
+  function set_percentage1(uint256 _percentage) external onlyOwner{
+        percentage1 = _percentage;      
+  }
+
+  function set_percentage2(uint256 _percentage) external onlyOwner{
+        percentage2 = _percentage;      
+  }
+
+  function stake(uint256 _amountToken, address _token, uint256 _option ) external {
+
+    address user = msg.sender;
+    Token = ERC20(_token); 
+    Token.transferFrom(msg.sender, address(this), _amountToken);
+
+    require(userStake[user][_option][_token].exist == false, "You have already stake and lock this token");
+    require (_amountToken > 0, "Amount has to be > to 0");
+    require (_option <= 3, "should be 0 or 1");
+
+
+    userStake[user][_option][_token]=Stake(_amountToken, block.timestamp, true, true);
+
+    emit tokenStaked(msg.sender, _amountToken, _option, block.timestamp);
+
+  }
+
+  function withdrawTokens(address _token, uint _option) public {
+    
+    uint256 _time = block.timestamp;
+    address user = msg.sender;
+    uint amountToWithdraw;
+
+    require(userStake[user][_option][_token].exist == true, "You don't have this token staked");
+    
+    if(_option == 2){
+
+      require(userStake[user][_option][_token].time+5 < _time,"5 seconds not passed");
+
     }
 
-    function set_percentage1(uint256 _percentage) external onlyOwner{
-         percentage1 = _percentage;      
+    if(_option == 1){
+
+      require(userStake[user][_option][_token].time+(3*MOUNTH) < _time,"3 mounths not passed");
+
     }
-    function set_percentage2(uint256 _percentage) external onlyOwner{
-         percentage2 = _percentage;      
+
+    if(_option == 0){
+
+      require(userStake[user][_option][_token].time+DAY < _time,"day not passed");
+
     }
 
+    amountToWithdraw = userStake[user][_option][_token].amount;
 
+    delete userStake[user][_option][_token].amount;
+    delete userStake[user][_option][_token].exist;
+    delete userStake[user][_option][_token].time;
 
-   function stake(uint256 _amountToken,address token,uint256 _option ) 
-    external  {
-        //Transfer amount to smartcontract
-       Token = ERC20(token); 
-       Token.transferFrom(msg.sender, address(this), _amountToken);
+    IERC20(_token).transfer(msg.sender, amountToWithdraw);
 
-        require ( _amountToken >= 0," Amount 0");
-        require ( _option <= 2," should be 1 or 0");
-        address user=msg.sender;
+  }
 
-       
-        if(userStake[user][token].exist==0) 
-            { userStake[user][token]=Stake(_amountToken,_option, block.timestamp,1);
-             nbTokenUser[user]++;
-             TokenUser[user].push(token);
-            }
-           
-            
+  function claimRewards(uint _option, address _token) public {
 
+    address _user = msg.sender;
+    uint256 _time = block.timestamp;
+    uint256 _reward;
+    uint256 _stakedTime;
+    uint256 rateStaked;
+    
+    require(userStake[_user][_option][_token].toClaim, "You don't have stake this token");
+
+    if(_option == 2) {
+      require(userStake[_user][_option][_token].time+5 < _time,"5 seconds not passed");
+
+      _stakedTime = 5;
+    }
+
+    if(_option == 1) {
+      require(userStake[_user][_option][_token].time+(3*MOUNTH)<_time,"3 mounths not passed");
+
+      _stakedTime = 3*MOUNTH;
+    }
+
+    if(_option == 0){
+      require(userStake[_user][_option][_token].time+DAY<_time,"day not passed");
+
+      _stakedTime = DAY;
+    }
+
+    rateStaked = (_stakedTime*percentage3/100)/(360*24*60*60);
+    _reward = userStake[_user][_option][_token].amount*rateStaked;
+    userStake[_user][_option][_token].toClaim = false;
           
-         else 
-         userStake[user][token].amount += _amountToken;
+    AYA.mint(_user, _reward);
 
+  }
 
-     
-
-        
-    }   
-   function reward(address user ,address token ) 
-    public returns (uint256){
-        
-        uint256 _reward;
-
-
-        uint256 _option= userStake[user][token].option;
-        uint256 _time =block.timestamp;
-        uint256 rateStaked;
-        if(_option==0){ //reward is 10% of stacked amount if 1 DAY
-      
-      
-            rateStaked =_time-userStake[user][token].time*percentage1*1e18/360/24/60/60; // 1e8 parce que c un entier ;  
-
-            _reward = userStake[user][token].amount*rateStaked/1e18;
-
-        }
-
-
-        else 
-        {  
-            //reward is 30% of stacked amount if 3 MOUNTH
-         
-            rateStaked=_time-userStake[user][token].time*percentage2*1e18/360/24/60/60; // 1e8 parce que c un entier ;  
-            _reward=userStake[user][token].amount*rateStaked/1e18;             
-        }
-            usersReward[user][token]=_reward;
-        return _reward;
-    }     
-    function withdrawTokens(address token, uint256 amount) public {
-      
-       uint256 _option;
-       uint256 _time =block.timestamp;
-        address user=msg.sender;
-
- 
-        require(amount > 0, "You cannot withdraw 0 token !");
-        require(userStake[user][token].exist==1, "You dont have this token staked !");
-        require(amount<=userStake[user][token].amount, "You dont have this amount !");
-        _option=userStake[user][token].option;
-        if(_option==1){
-            require(userStake[user][token].time+(3*MOUNTH)<_time,"3mounth not passed");
-        }
-        if(_option==0){
-            require(userStake[user][token].time+DAY<_time,"day not passed");
-        }
-        userStake[user][token].amount-=amount;
-        IERC20(token).transfer(msg.sender, amount);
-
-    }
-
-    function ClaimRewards() public {
-        
-       require(nbTokenUser[msg.sender]>0 ,"No Reward to claim !");
-        uint256 amountClaimed=0;//compute if rewrds available now
-        
-        address _token;
-        uint256 _reward;
-        for (uint256 j = 0; j <nbTokenUser[msg.sender] ; j++){
-            _token=TokenUser[msg.sender][j];
-            _reward=reward(msg.sender,_token);
-            amountClaimed+=usersReward[msg.sender][_token];
-            usersReward[msg.sender][_token]=0;
-
-        }
-        
-       
-       // MINT      
-       AYA.mint(msg.sender,amountClaimed);
-
-
-    }
-
-    function getTokenPrice(address tokenAddress) public view returns (int256) {
-        try priceConsumer.getLatestPrice(tokenAddress) returns (
-            int256 price
-        ) {
-            return price;
-        } catch {
-            return 0;
-        }
-    }
+  function getTokenPrice(address tokenAddress) public view returns (int256) {
+      try priceConsumer.getLatestPrice(tokenAddress) returns (
+          int256 price
+      ) {
+          return price;
+      } catch {
+          return 0;
+      }
+  }
 
 
 }
