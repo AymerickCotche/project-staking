@@ -1,0 +1,106 @@
+@use '../../styles/vars';
+
+.card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: vars.$color2;
+  padding: vars.$gutter;
+  border-radius: 5px;
+  -webkit-box-shadow: inset 1px 1px 5px #fff;
+  box-shadow: inset 1px 1px 5px #fff;
+  border: 1px solid rgba(0,0,0,.2);
+
+  &__desc {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    &__title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 0.5em;
+      align-self: center;
+    }
+    &__type {
+      margin-bottom: 0.25em;
+    }
+    &__apr {
+      margin-bottom: 0.25em;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    &__stake {
+      display: flex;
+      background-color: vars.$color3;
+      padding: 0.5em;
+      margin-bottom: vars.$halfGutter;
+      &__input {
+        color: #EEE;
+        background: none;
+        border: none;
+      }
+      &__usemax:hover {
+        color: blue;
+        cursor: pointer;
+      }
+    }
+    &__btn:hover {
+      color: blue;
+    }
+    &__btn {
+      color: #EEE;
+      background-color: vars.$color3;
+      padding: 1em;
+      border: none;
+      border-radius: 5px;
+      -webkit-box-shadow: inset 1px 1px 5px #fff;
+      box-shadow: inset 1px 1px 5px #fff;
+    }
+  }
+
+  &__infos {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    &__stacked {
+      margin-bottom: 0.25em;
+    }
+    &__rewards {
+      margin-bottom: 0.25em;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    &__unstake:hover {
+      color: blue;
+    }
+    &__unstake {
+      color: #EEE;
+      background-color: vars.$color3;
+      padding: 1em;
+      border: none;
+      border-radius: 5px;
+      -webkit-box-shadow: inset 1px 1px 5px #fff;
+      box-shadow: inset 1px 1px 5px #fff;
+      margin-bottom: 0.8em;
+    }
+    &__collect:hover {
+      color: blue;
+    }
+    &__collect {
+      color: #EEE;
+      background-color: vars.$color3;
+      padding: 1em;
+      border: none;
+      border-radius: 5px;
+      -webkit-box-shadow: inset 1px 1px 5px #fff;
+      box-shadow: inset 1px 1px 5px #fff;
+    }
+  }
+}
+

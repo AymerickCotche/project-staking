@@ -7,6 +7,7 @@ import Web3 from 'web3';
 
 import Staking from '../../contracts/Staking.json';
 import styles from './Header.module.scss';
+import { setIsAdmin } from '../../app/actions/staking';
 
 
 const Header = () => {
@@ -18,6 +19,9 @@ const Header = () => {
   const errorMessage = useSelector((state) => state.web3.metamask.errorMessage);
   const userAddress = useSelector((state) => state.web3.address);
   const mmConnected = useSelector((state) => state.web3.metamask.isConnected);
+
+  const isAdmin = useSelector((state) => state.staking.isAdmin);
+  const ayaInstance = useSelector((state) => state.staking.ayaInstance);
 
   useEffect(() => {
     dispatch(checkMetamaskInstall());
@@ -35,6 +39,14 @@ const Header = () => {
     }
   }, [mmConnected]);
 
+  useEffect(() => {
+    if(userAddress === process.env.ownerAddress.toLocaleLowerCase()) {
+      dispatch(setIsAdmin(true));
+    } else {
+      dispatch(setIsAdmin(false));
+    }
+  }, [userAddress]);
+
   const handleClick = () => {
     dispatch(checkMetamaskInit());
     dispatch(connectMetamask());
@@ -43,7 +55,11 @@ const Header = () => {
     const instance = new web3.eth.Contract(Staking.abi, Staking.networks[42].address);
     dispatch(saveWeb3(web3));
     dispatch(saveInstance(instance));
-};
+  };
+  
+  const handleClickClaimToken = async () => {
+    await ayaInstance.methods.claimFreeTokens().send({from: userAddress});
+  }
 
   return (
     <div className={styles.header__container}>
@@ -51,9 +67,20 @@ const Header = () => {
         <Link href="/">
           <h1 className={styles.header__title}>Staking</h1>
         </Link>
-        <Link href="/mint">
-          <a>Mint Alyra Token</a>
-        </Link>
+
+        <a
+          onClick={handleClickClaimToken}
+          className={styles.header__claim}
+        >
+          Claim Alyra Token (only once)
+        </a>
+
+        {isAdmin && 
+          <Link href="/adminspace">
+            <a>Admin Space</a>
+          </Link>
+        }
+        
         <div>
         {mmInstalled && !mmConnected &&
           <button

@@ -1,21 +1,15 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity ^0.8.4;
-import "./AlyraToken.sol";
-import "./PriceConsumer.sol";
+
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
+import "./AlyraToken.sol";
+import "./PriceConsumer.sol";
 
-
-
-contract Staking is Ownable  {
-
-  
-
-
-       
+contract Staking is Ownable  {       
     
      struct Stake {
         uint256 amount;
@@ -23,22 +17,27 @@ contract Staking is Ownable  {
         uint256 time; 
         uint exist;   
     }
-    ERC20 public  Token;
+    
     uint256 constant FACTOR = 1e6;
     uint256 constant DAY = 86400;
     uint256 constant MOUNTH = 2592000;
+
     mapping(address => mapping(address=>uint)) usersReward;
     mapping(address => mapping(address=>Stake)) userStake;
     mapping(address=>uint256)nbTokenUser;
     mapping(address=>address[])TokenUser;
-    AlyraToken public AYA ;
+
+    ERC20 public Token;
+    AlyraToken AYA;
     PriceConsumer private priceConsumer = new PriceConsumer();
+
     uint256 percentage1=10;
     uint256 percentage2=30;
-    ///changer les % reward
-    constructor(address alyraaddress){
-      AYA= AlyraToken(alyraaddress) ;
+
+    constructor(AlyraToken _aya){
+      AYA = _aya ;
     }
+
     function set_percentage1(uint256 _percentage) external onlyOwner{
          percentage1 = _percentage;      
     }

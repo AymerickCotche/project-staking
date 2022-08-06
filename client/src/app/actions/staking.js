@@ -5,6 +5,8 @@ import Web3 from 'web3';
 import AlyraToken from '../../contracts/AlyraToken.json';
 import Staking from '../../contracts/Staking.json';
 
+export const setIsAdmin = createAction('staking/setIsAdmin');
+
 export const getAyaInstance = createAsyncThunk('staking/getAyaInstance', async () => {
   const web3 = new Web3(window.ethereum);
   const ayaInstance = new web3.eth.Contract(AlyraToken.abi, AlyraToken.networks[42].address);
@@ -20,3 +22,6 @@ export const getStakingInstance = createAsyncThunk('staking/getStakingInstance',
 })
 
 export const setInputQuantity = createAction('staking/setInputQuantity');
+
+export const setInputContractOwner = createAction('staking/setInputContractOwner');
+

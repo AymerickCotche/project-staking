@@ -12,6 +12,10 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  &__claim:hover {
+    color: blue;
+    cursor: pointer;
+  }
   &__btn {
     color: white;
     padding: vars.$gutter 2*vars.$gutter;
