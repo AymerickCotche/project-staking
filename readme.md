@@ -1,5 +1,11 @@
 # Project 4 : Defi - Créer une dapp de Staking
 
+## Réalisé par
+
+- Hakim Atassi
+- Akram Cheriaa
+- Aymerick Cotché
+
 ## Objectifs
 
 - Stake son token ERC20 
