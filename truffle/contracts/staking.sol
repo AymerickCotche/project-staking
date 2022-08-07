@@ -73,17 +73,18 @@ contract Staking is Ownable  {
 
   function withdrawTokens(address _token, uint _option) public {
     
+    address user = msg.sender;
+    
     require(userStake[user][_option][_token].toClaim == false);
     
     uint256 _time = block.timestamp;
-    address user = msg.sender;
     uint amountToWithdraw;
 
     require(userStake[user][_option][_token].exist == true, "You don't have this token staked");
     
     if(_option == 2){
 
-      require(userStake[user][_option][_token].time+5 < _time,"5 seconds not passed");
+      require(userStake[user][_option][_token].time+15 < _time,"15 seconds not passed");
 
     }
 
@@ -122,9 +123,9 @@ contract Staking is Ownable  {
     require(userStake[_user][_option][_token].toClaim, "You don't have stake this token");
 
     if(_option == 2) {
-      require(userStake[_user][_option][_token].time+5 < _time,"5 seconds not passed");
+      require(userStake[_user][_option][_token].time+15 < _time,"15 seconds not passed");
 
-      _stakedTime = 5;
+      _stakedTime = 15;
     }
 
     if(_option == 1) {

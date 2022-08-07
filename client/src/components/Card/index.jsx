@@ -1,12 +1,13 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import Image from 'next/image';
+import web3 from 'web3';
 
 import styles from './Card.module.scss';
 import ayalogo from '../../../public/ayalogo.png';
-import { getAyaInstance, getStakingInstance, setAyaBalance, setAyaRewards5s, setAyaStaked5s, setAyaUnlock5s, setInputQuantity5s } from '../../app/actions/staking';
+import { getAyaInstance, getStakingInstance, setAyaBalance, setAyaRewards5s, setAyaStaked5s, setAyaStakedAt5s, setAyaUnlock5s, setHasApproved, setInputQuantity5s } from '../../app/actions/staking';
 
-
+const BN = web3.utils.BN;
 
 const Card = () => {
 
@@ -16,12 +17,12 @@ const Card = () => {
 
   const mmConnected = useSelector((state) => state.web3.metamask.isConnected);
   const ayaInstance = useSelector((state) => state.staking.ayaInstance);
+  const hasApproved = useSelector((state) => state.staking.hasApproved);
   const ayaBalance = useSelector((state) => state.staking.ayaBalance);
   const ayaStaked5s = useSelector((state) => state.staking.ayaStaked5s);
   const ayaRewards5s = useSelector((state) => state.staking.ayaRewards5s);
   const ayaUnlock5s = useSelector((state) => state.staking.ayaUnlock5s);
-
-
+  const ayaStakedAt5s = useSelector((state) => state.staking.ayaStakedAt5s);
 
   const stakingInstance = useSelector((state) => state.staking.stakingInstance);
 
@@ -43,13 +44,36 @@ const Card = () => {
       const balance = await ayaInstance.methods.balanceOf(address).call({ from: address });
       const stakedToken = await stakingInstance.methods.getCurrentStake(address, ayaInstance.options.address, 2).call({from: address});
       dispatch(setAyaStaked5s(stakedToken.amount));
+      if(Number(stakedToken.amount) > 0) {
+        const rewards = (15*3110400000/100)/(360*24*60*60)*Number(stakedToken.amount);
+        dispatch(setAyaRewards5s(rewards));
+        dispatch(setAyaStakedAt5s(Number(stakedToken.time)));
+      }
       dispatch(setAyaBalance(balance));
     }
     if (ayaInstance) {
       getAyaBalance();
     }
 
-  }, [ayaInstance, address])
+  }, [ayaInstance, address]);
+
+  useEffect(() => {
+
+    if(ayaUnlock5s > 0 || ayaStakedAt5s > 0) {
+
+      const intervalId = setInterval(() => {
+          
+        dispatch(setAyaUnlock5s(ayaStakedAt5s + 15 - Math.floor(Date.now() / 1000)));
+
+        if (ayaStakedAt5s + 15 - Math.floor(Date.now() / 1000) <= 0) {
+          clearInterval(intervalId);
+          dispatch(setAyaUnlock5s('Collect now'));
+        }
+  
+      }, 100);
+    }
+    
+  }, [ayaUnlock5s, ayaStakedAt5s])
 
   const handleChangeInputQuantity = (e) => {
     const re = /^[0-9\b]+$/;
@@ -67,16 +91,23 @@ const Card = () => {
     
   }
 
+  const handleClickApproveContract = async () => {
+    const maxAmount = new BN("2").pow(new BN("256").sub(new BN("1")));
+    await ayaInstance.methods.approve(stakingInstance.options.address, maxAmount.toString()).send({from: address});
+    dispatch(setHasApproved(true));
+  }
+
   const handleClickStakeNow = async (e) => {
     e.preventDefault();
     await stakingInstance.methods.stake(inputQuantity5s, ayaInstance.options.address, 2).send({from: address})
-    .on('receipt', () => {
-      // const stakedAt = receipt.events.tokenStaked.returnValues.time;
-      dispatch(setAyaBalance(ayaBalance-inputQuantity5s));
+    .on('receipt', async (receipt) => {
+      const stakedAt = await receipt.events.tokenStaked.returnValues.time;
+      dispatch(setAyaBalance(ayaBalance - inputQuantity5s));
       dispatch(setAyaStaked5s(inputQuantity5s));
-      const rewards = (5*3110400000/100)/(360*24*60*60)*inputQuantity5s;
+      const rewards = (15*3110400000/100)/(360*24*60*60)*inputQuantity5s;
       dispatch(setAyaRewards5s(rewards));
-      dispatch(setAyaUnlock5s('5 secondes'));
+      dispatch(setAyaUnlock5s(15));
+      dispatch(setAyaStakedAt5s(Number(stakedAt)));
       dispatch(setInputQuantity5s(''));
     });
   }
@@ -111,11 +142,11 @@ const Card = () => {
       </div>
       <div className={styles.card__desc}>
         <h3 className={styles.card__desc__title}>AYA</h3>
-        <p className={styles.card__desc__type}>Lock : 5 seconds</p>
+        <p className={styles.card__desc__type}>Lock : 15 seconds</p>
         <p className={styles.card__desc__apr}>APR : 3110400000%</p>
         <p className={styles.card__desc__balance}>Balance : {ayaBalance} AYA</p>
       </div>
-      <form className={styles.card__form}>
+      <div className={styles.card__form}>
       
         <div className={styles.card__form__stake}>
           <input
@@ -129,22 +160,46 @@ const Card = () => {
           <p className={styles.card__form__stake__usemax} onClick={handleClickUseMax}>use max</p>
         </div>
         
-        <button
-          className={styles.card__form__btn}
-          onClick={handleClickStakeNow}
-        >
-          STAKE NOW
-        </button>
-      </form>
+        {!hasApproved && 
+          <button
+            className={styles.card__form__btn}
+            onClick={handleClickApproveContract}
+            disabled={!mmConnected}
+          >
+            APPROVE CONTRACT
+          </button>
+        }
+        {hasApproved && 
+          <button
+            className={styles.card__form__btn}
+            onClick={handleClickStakeNow}
+            disabled={!mmConnected || !inputQuantity5s}
+          >
+            STAKE NOW
+          </button>
+        }
+      </div>
       <div className={styles.card__infos}>
         <p className={styles.card__infos__stacked}>Staked : {ayaStaked5s}</p>
         <p className={styles.card__infos__rewards}>Rewards : {ayaRewards5s}</p>
-        <p className={styles.card__infos__unlock}>Unlock in : {ayaUnlock5s}</p>
+        <p className={styles.card__infos__unlock}>Unlock in : {`${ayaUnlock5s && ayaUnlock5s} ${typeof(ayaUnlock5s) === 'number' ? 'seconds': ''}`}</p>
 
       </div>
       <div className={styles.card__actions}>
-        <button className={styles.card__actions__unstake} onClick={handleClickUnstake}>Unstake</button>
-        <button className={styles.card__actions__collect} onClick={handleClickCollect}>Collect</button>
+        <button
+          className={styles.card__actions__collect}
+          onClick={handleClickCollect}
+          disabled={!mmConnected}
+        >
+          Collect
+        </button>
+        <button
+          className={styles.card__actions__unstake}
+          onClick={handleClickUnstake}
+          disabled={!mmConnected}
+        >
+          Unstake
+        </button>
       </div>
       
     </div>

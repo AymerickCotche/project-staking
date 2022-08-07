@@ -9,6 +9,8 @@ contract AlyraToken is ERC20,Ownable {
 
     mapping(address=>bool) hasClaim;
 
+    event approved(address owner, address contractAddress, uint amount);
+
     constructor() ERC20("AYA Coin", "AYA") {}
 
     function decimals() public view virtual override returns (uint8) {
@@ -19,8 +21,11 @@ contract AlyraToken is ERC20,Ownable {
       contractOwner = _contractOwner;
     }
 
-    function ApproveToken(address tokenAddress, uint256 amount) public {
-        ERC20(tokenAddress).approve((msg.sender), amount);
+    function approve(address spender, uint256 amount) public override returns (bool) {
+        address owner = _msgSender();
+        _approve(owner, spender, amount);
+        emit approved(owner, spender, amount);
+        return true;
     }
 
     function mint(address recipient, uint256 amount) external {

@@ -15,6 +15,8 @@ export const getAyaInstance = createAsyncThunk('staking/getAyaInstance', async (
 
 export const setAyaBalance = createAction('staking/setAyaBalance');
 
+export const setHasApproved = createAction('staking/setHasApproved');
+
 export const setAyaStaked5s = createAction('staking/setAyaStaked5s');
 export const setAyaStaked1d = createAction('staking/setAyaStaked1d');
 export const setAyaStaked3m = createAction('staking/setAyaStaked3m');
@@ -24,8 +26,12 @@ export const setAyaRewards1d = createAction('staking/setAyaRewards1d');
 export const setAyaRewards3m = createAction('staking/setAyaRewards3m');
 
 export const setAyaUnlock5s = createAction('staking/setAyaUnlock5s');
-export const setAyaUnlock1d = createAction('staking/setAyUnlocks1d');
-export const setAyaReUnlock3m = createAction('staking/setAyaUnlock3m');
+export const setAyaUnlock1d = createAction('staking/setAyaUnlock1d');
+export const setAyaUnlock3m = createAction('staking/setAyaUnlock3m');
+
+export const setAyaStakedAt5s = createAction('staking/setAyaStakedAt5s');
+export const setAyaStakedAt1d = createAction('staking/setAyaStakedAt1d');
+export const setAyaStakedAt3m = createAction('staking/setAyaStakedAt3m');
 
 
 export const getStakingInstance = createAsyncThunk('staking/getStakingInstance', async () => {

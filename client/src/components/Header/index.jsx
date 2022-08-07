@@ -7,7 +7,7 @@ import Web3 from 'web3';
 
 import Staking from '../../contracts/Staking.json';
 import styles from './Header.module.scss';
-import { setIsAdmin } from '../../app/actions/staking';
+import { setAyaBalance, setIsAdmin } from '../../app/actions/staking';
 
 
 const Header = () => {
@@ -22,6 +22,8 @@ const Header = () => {
 
   const isAdmin = useSelector((state) => state.staking.isAdmin);
   const ayaInstance = useSelector((state) => state.staking.ayaInstance);
+  const stakingInstance = useSelector((state) => state.staking.stakingInstance);
+
 
   useEffect(() => {
     dispatch(checkMetamaskInstall());
@@ -58,7 +60,10 @@ const Header = () => {
   };
   
   const handleClickClaimToken = async () => {
-    await ayaInstance.methods.claimFreeTokens().send({from: userAddress});
+    await ayaInstance.methods.claimFreeTokens().send({from: userAddress})
+    .on('receipt', () => {
+      dispatch(setAyaBalance(100000));
+    });
   }
 
   return (

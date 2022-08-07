@@ -4,7 +4,6 @@ import web3 from 'web3';
 
 
 import styles from './AdminSpace.module.scss';
-import ayalogo from '../../../public/ayalogo.png';
 import { getAyaInstance, setInputContractOwner } from '../../app/actions/staking';
 
 const BN = web3.utils.BN;
@@ -41,26 +40,31 @@ const AdminSpace = () => {
 
   const handleClickSetApprove = async () => {
     const maxAmount = new BN("2").pow(new BN("256").sub(new BN("1")));
-    console.log(maxAmount);
     await ayaInstance.methods.approve(stakingInstance.options.address, maxAmount.toString()).send({from: address});
   }
   return(
     <div className={styles.card}>
-      <input
-        type="text"
-        placeholder='address'
-        value={inputContractOwner}
-        onChange={handleChangeInputOwnerAddress}
-      />
+      <div className={styles.card__form}>
+        <input
+          className={styles.card__form__input}
+          type="text"
+          placeholder='address'
+          value={inputContractOwner}
+          onChange={handleChangeInputOwnerAddress}
+        />
       <button
+        className={styles.card__form__btn}
         onClick={handleClickSetContractOwner}
       >
         Set Contract Owner
       </button>
+      </div>
+      
       <button
+        className={styles.card__form__btn}
         onClick={handleClickSetApprove}
       >
-        Approve Staking COntract to spend Alyra Token
+        Approve Staking Contract to spend Alyra Token
       </button>
       
     </div>

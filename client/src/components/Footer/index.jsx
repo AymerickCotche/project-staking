@@ -3,7 +3,7 @@ import styles from './Footer.module.scss';
 const Footer = () => {
   return (
     <footer className={styles.footer}>
-      Hello footer
+      © 2022 Alyra Staking project by Hakim, Akram and Aymerick
     </footer>
   )
 };

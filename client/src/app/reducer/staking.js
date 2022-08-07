@@ -1,26 +1,36 @@
 import { createReducer } from '@reduxjs/toolkit';
-import { setAyaBalance, getAyaInstance, getStakingInstance, setIsAdmin, setInputContractOwner, setAyaStaked5s, setAyaStaked1d, setAyaStaked3m, setInputQuantity5s, setInputQuantity1d, setInputQuantity3m, setAyaRewards5s, setAyaRewards1d, setAyaRewards3m, setAyaUnlock5s, setAyaUnlock1d, setAyaReUnlock3m } from '../actions/staking';
+import { setAyaBalance, getAyaInstance, getStakingInstance, setIsAdmin, setInputContractOwner, setAyaStaked5s, setAyaStaked1d, setAyaStaked3m, setInputQuantity5s, setInputQuantity1d, setInputQuantity3m, setAyaRewards5s, setAyaRewards1d, setAyaRewards3m, setAyaUnlock5s, setAyaUnlock1d, setAyaUnlock3m, setAyaStakedAt5s, setAyaStakedAt1d, setAyaStakedAt3m, setHasApproved } from '../actions/staking';
 
 
 const initialState = {
   isAdmin: false,
   ayaInstance: null,
+  stakingInstance: null,
+  inputContractOwner: '',
+
+  hasApproved: false,
+
   ayaBalance: 0,
+
   ayaStaked5s: 0,
   ayaStaked1d: 0,
   ayaStaked3m: 0,
+
   ayaRewards5s: 0,
   ayaRewards1d: 0,
   ayaRewards3m: 0,
+
   ayaUnlock5s: 0,
   ayaUnlock1d: 0,
   ayaUnlock3m: 0,
-  ayaUnlockIn: null,
+
+  ayaStakedAt5s: null,
+  ayaStakedAt1d: null,
+  ayaStakedAt3m: null,
+
   inputQuantity5s: '',
   inputQuantity1d: '',
   inputQuantity3m: '',
-  inputContractOwner: '',
-  stakingInstance: null,
 };
 
 export const stakingReducer = createReducer(initialState, (builder) => {
@@ -33,6 +43,9 @@ export const stakingReducer = createReducer(initialState, (builder) => {
   })
   .addCase(setAyaBalance, (state, action) => {
     state.ayaBalance = action.payload;
+  })
+  .addCase(setHasApproved, (state, action) => {
+    state.hasApproved = action.payload;
   })
   .addCase(setAyaStaked5s, (state, action) => {
     state.ayaStaked5s = action.payload;
@@ -67,8 +80,17 @@ export const stakingReducer = createReducer(initialState, (builder) => {
   .addCase(setAyaUnlock1d, (state, action) => {
     state.ayaUnlock1d = action.payload;
   })
-  .addCase(setAyaReUnlock3m, (state, action) => {
+  .addCase(setAyaUnlock3m, (state, action) => {
     state.ayaUnlock3m = action.payload;
+  })
+  .addCase(setAyaStakedAt5s, (state, action) => {
+    state.ayaStakedAt5s = action.payload;
+  })
+  .addCase(setAyaStakedAt1d, (state, action) => {
+    state.ayaStakedAt1d = action.payload;
+  })
+  .addCase(setAyaStakedAt3m, (state, action) => {
+    state.ayaStakedAt3m = action.payload;
   })
   .addCase(setInputContractOwner, (state, action) => {
     state.inputContractOwner = action.payload;

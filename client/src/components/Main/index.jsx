@@ -9,7 +9,7 @@ const Main = () => {
     <div className={styles.main}>
       <h2 className={styles.main__title}>Stake your token to receive passive income</h2>
       <div className={styles.main__filter}>
-        <button className={`${styles.main__filter__btn} ${styles.main__filter__btn__cinqs}`}>Lock : 5 seconds</button>
+        <button className={`${styles.main__filter__btn} ${styles.main__filter__btn__cinqs}`}>Lock : 15 seconds</button>
         <button className={`${styles.main__filter__btn} ${styles.main__filter__btn__oned}`}>Lock : 1 day</button>
         <button className={`${styles.main__filter__btn} ${styles.main__filter__btn__threem}`}>Lock : 3 months</button>
 
